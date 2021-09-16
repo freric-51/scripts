@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-dir_base="/media/Dados/Documentos/code/GitHub"
-dir_repo="/bootcamps"
+dir_base="/home/ric/Documentos/code/GitHub"
+# dir_base="/media/Dados/Documentos/code/GitHub"
+dir_repo="/uCPU"
 
 clear
 
@@ -16,6 +17,7 @@ status)
 	git config --global user.name "freric-51"
 	git config --global user.email "ricdefreitas@hotmail.com"
 	git config --global color.ui true
+	git config --global core.symlinks true
 	echo -e "nreturn of list: desconsidere gui.recentrepo"
 	git config --list
 	echo -e "\nreturn of status:"
