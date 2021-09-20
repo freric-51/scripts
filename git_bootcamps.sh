@@ -32,6 +32,7 @@ pull)
 push)
 	#cd "$dir_base$dir_repo"
 	#git push bootcamps main
+	#git push origin main (master)
 	;;
 	
 
