@@ -4,7 +4,6 @@ dir_base="/home/ric/Documentos/code/GitHub"
 dir_repo="/scripts"
 
 clear
-cd $dir_base
 
 case $1 in
 clone)
