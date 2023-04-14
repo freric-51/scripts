@@ -30,10 +30,18 @@ pull)
 	;;
 
 push)
+    cd "$dir_base$dir_repo"
 	#cd "$dir_base$dir_repo"
-	#git push bootcamps main
+    git commit -a -m "syncs"
+    #git push REPO main
+    git push
 	;;
 
+branchs)
+    cd "$dir_base$dir_repo"
+    git branch
+    git branch -r
+    ;;
 
 esac
 
