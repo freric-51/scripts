@@ -39,8 +39,7 @@ push)
 
 branchs)
     cd "$dir_base$dir_repo"
-    git branch
-    git branch -r
+    git branch -vva
     ;;
 
 esac
