@@ -1,3 +1,3 @@
 # scripts
-My small scripts :smirk: <h1>
+<h1>My small scripts :smirk:
 - o script update_pips.py
