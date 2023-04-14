@@ -1,7 +1,7 @@
 # scripts
 <h1>My small scripts :smirk:</h1>
 
-Script | Desc.
+Script | Desc. :brazil:
 --------------:|:--------------
 git_repo.sh| Um lembrete do que devo digitar para manter o git sincronizado.
 update_pips.py| Eu uso este script para tentar igualar/achar as diferenças entre meus computadores.<br /> Atualmente são 3:<br /> 1. um laptop com Ubuntu e Xfce onde programo e escuto musica<br /> 2. um desktop com <b>Zorin OS</b> onde coloquei um servidor <b>WEB</b> e <b>MySQL</b> para meus estudos<br /> 3. um desktop com Ubuntu e XFce para os hospedes (**netos: :girl::girl: :girl: :boy::girl: :boy:**)
