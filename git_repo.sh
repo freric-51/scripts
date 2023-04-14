@@ -45,7 +45,7 @@ branchs)
 esac
 
 cd "$dir_base"
-
+echo -e "\n"
 echo "git status"
 echo "git add"
 echo "git commit"
