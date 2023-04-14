@@ -32,7 +32,7 @@ pull)
 push)
     cd "$dir_base$dir_repo"
 	#cd "$dir_base$dir_repo"
-    git commit -a -m "syncs"
+    git commit -a -m "file synchronization"
     #git push REPO main
     git push
 	;;
