@@ -3,7 +3,7 @@ dir_base="/home/ric/Documentos/code/GitHub"
 # dir_base="/media/Dados/Documentos/code/GitHub"
 dir_repo="/scripts"
 
-clear
+echo -e "\n\n\n\n\n"
 
 case $1 in
 clone)
