@@ -1,8 +1,8 @@
-# TODO update_pips.py + dev_pc_list.py
+# update_pips.py + dev_pc_list.py
 
 ## Manter a base Python igual em todos os meus computadores
 
-### Tratamento de pacotes em visão geral
+### Tratamento de pacotes em **Geral**
 
 - [x] Encontrar os pacotes Python que não estão no computador
 - [ ] Verificar as falhas de Instalação
@@ -11,7 +11,7 @@
     - [x] SOs (sistema operacional) levemente diferentes mas baseados em Ubuntu LTS defasados de uma versão.
     - [ ] Verificar se um pacote é para Python 2.x ou 3.x
 
-### Tratamento de pacotes usando Virtual Enviroment
+### Tratamento de pacotes usando **Virtual Enviroment**
 
 - [ ] Estudar o como se faz e se possível e funcional
   - [ ] Implementar o env global
