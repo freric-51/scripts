@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
     Programa para update, instalação e sincronismo
-    de pacotes python entre as máquinas do cafofo.
+    de pacotes python entre as máquinas do meu laboratório,
+    no porão da minha casa.
 """
 # packs installed in  ./.local/lib/python3.8/
 import os
