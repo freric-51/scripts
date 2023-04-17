@@ -4,6 +4,7 @@ Montar computadores é algo que faço para meu uso pessoal desde longo tempo.
 Previamente eu havia montado um computador com o processsador NEC V20 que era um clone do 8088 rodando a 8 MHz, depois passei para um 386SX, época dos PCs onde o estado de arte ficava a cargo da dupla DOS 6 e Windows 3.11.
 
 Para cada aplicação deveria-se iniciar o computador com um limite de drivers e variáveis de sistema para que os 640 KBytes de RAM ( *memória baixa* ) pudessem ser reservados para a aplicação a ser usada.
+<br /> **acad12.bat** é o típico exemplo onde na primeira linha eu ajustava o mouse para o autocad.
 <br />Nada de multimidia on board. Som e video só em placas separadas colocadas no barramento ISA e eu só liberava a placa de som para os joguinhos dos meus filhos.
 <br />O DOS/WINDOWS carregava, por padrão, tudo na *memória baixa* e todo os periféricos com as respecivas ROMs e área de transferência de dados ficavam na *memória alta*, endereçados dos 640 KB até os 1024 KB ( 384 KB ).
 **DEVICEHIGH** apareceu como uma diretiva *fantástica* do config.sys. No computador eu instalava 1024 MB de RAM e a *memória alta* era como um espelhamento desta RAM com o IO, isso mesmo, eu não tinha disponíveis 384 KB de RAM, eu tinha 384 KB menos o usado pelo IO. Assim, a **DEVICEHIGH** direcionava os **drivers** para a memória não usada pelo IO.
