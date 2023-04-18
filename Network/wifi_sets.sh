@@ -8,12 +8,23 @@ function find_device {
 }
 
 function connected {
-	#V=``
-	# echo $V
-
-	V=`cat /sys/class/net/$placa/carrier`
-	echo $V
+    V=`iw $placa link`
+    #echo $V
+    if [ $V eq "Not connected."]; then
+        V=0
+    else
+        V=1
+    if
 	return $?
+
+    # tentativa errada, o link fisico está ON independente da conexão.
+    # V=`cat /sys/class/net/$placa/carrier`
+
+    # tentativa errada, "Not connected." mesmo tendo ping
+    # V=`iw $placa link`
+    #echo $V
+    # "Not connected."
+
 }
 
 function set_wifi_network {
@@ -22,7 +33,7 @@ function set_wifi_network {
 	sleep 2
 	sudo ifconfig $placa up
 	sleep 2
-	sudo iwconfig $placa txpower 30
+	sudo iwconfig $placa txpower on
 	# iw reg get
 	sleep 1
 	return 2
@@ -35,8 +46,6 @@ cnn=`connected`
 echo $cnn
 cnn=`set_wifi_network`
 echo $cnn
-
-exit
 
 SAI_n=2
 while [ 1 -ne $SAI_n ]; do
@@ -52,7 +61,7 @@ while [ 1 -ne $SAI_n ]; do
 	sudo sleep 0.1
 	echo -e "stopping wifi ...\n"
 	sudo service network-manager stop
-	sleep 3
+	sleep 5
 	echo -e "starting wifi ...\n"
 	sudo service network-manager start
 	sleep 90
