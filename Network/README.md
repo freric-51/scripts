@@ -1,12 +1,12 @@
 # Network
 
-## Scripts simples para vasculhar o que tenho na rede e corrigir falhas nas conexões
+## Scripts simples para vasculhar o que tenho na rede e corrigir falhas nas conexões.
 
 ### O que espero
 
-- Meus computadores ficam sem conexão com a internet do nada, então forço uma reconexão.
-- Minha impressora entra em estado de baixa energia e fica dias sem trabalhar.
-- Normalmente os celulares ganham um IP diferente a cada conexão pois estão configurados para usar um MAC address aleatório,
+- Meus computadores ficam sem conexão com a internet do nada, então forço uma reconexão;
+- Minha impressora entra em estado de baixa energia e fica dias sem trabalhar;
+- Normalmente os celulares ganham um IP diferente a cada conexão pois estão configurados para usar um MAC address aleatório.
 
 ### porque colocar em script
 
@@ -17,6 +17,6 @@
 |:-|:-|
 |wifi_sets.sh|Reanima minha conexão WIFI que para sozinha. Tenho rodando em todos os meus computadores|
 |reinicia_impressoras.sh|reinicio o CUPS|
-|find_devices_in_my_net.sh|Um scan pelo minha rede do meu laptop|
-|vpn.sh|Grupo de comandos para o protonvpn|
-|rede.sh|reinicia o serviço de rede|
+|find_devices_in_my_net.sh|Um scan pela minha rede do meu laptop|
+|vpn.sh|Sequência de comandos para o protonvpn|
+|rede.sh|Reinicia o serviço de rede. Ficou sem uso após **wifi_sets.sh** atualizado|
