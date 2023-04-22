@@ -74,8 +74,8 @@ function dropbox_isrunning {
 
 function transfer_files {
     # GITHUB folder
-    A="/home/ric/Documents/code/GitHub/scripts"
-    B="/home/ric/bin"
+    A="$HOME/Documents/code/GitHub/scripts"
+    B="$HOME/bin"
     if [ -d $A ]; then
         cd "$A"
         # -----------------------
@@ -87,13 +87,13 @@ function transfer_files {
 
     # Net
     # movido para antes da sincronização de /bin pois há remoção de pacotes em /bim que foram copiados para /network
-    A="/home/ric/bin"
-    B="/home/ric/Dropbox/linux/bin"
+    A="$HOME/bin"
+    B="$HOME/Dropbox/linux/bin"
     C="/Network"
     exe_backup "$A$C" "$B$C"
 
-    A="/home/ric/Documents/code/GitHub/scripts/Network"
-    B="/home/ric/bin/Network"
+    A="$HOME/Documents/code/GitHub/scripts/Network"
+    B="$HOME/bin/Network"
     if [ -d $A ]; then
         cd "$A"
         # -----------------------
@@ -105,8 +105,8 @@ function transfer_files {
         exe_backup "$A$C" "$B$C" "wifi_sets.sh"
     fi
 
-    A="/home/ric/bin"
-    B="/home/ric/Dropbox/linux/bin"
+    A="$HOME/bin"
+    B="$HOME/Dropbox/linux/bin"
     C=""
     remove_file "$A$C" "$B$C" "find_devices_in_my_net.sh"
     remove_file "$A$C" "$B$C" "rede.sh"
@@ -116,8 +116,8 @@ function transfer_files {
     # Net fim
 
     # =========================================
-    A="/home/ric/bin"
-    B="/home/ric/Dropbox/linux/bin"
+    A="$HOME/bin"
+    B="$HOME/Dropbox/linux/bin"
     cd "$A"
     # =========================================
 
@@ -174,7 +174,7 @@ function transfer_files {
 
     # WWW server
     A="/var/www/html"
-    B="/home/ric/Dropbox/linux/apache/html"
+    B="$HOME/Dropbox/linux/apache/html"
     if [ -d $A ]; then
         cd "$A"
         # -----------------------
