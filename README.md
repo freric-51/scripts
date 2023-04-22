@@ -9,3 +9,4 @@
 ||backup_bin.sh|É um copiador que coloca meus scripts nos 3 computadores, independentemente de onde foi feita a alteração.|
 |b|dev_pc_list.py|Este script foi criado quando eu percebi que nem todos os pacotes instalados pelo pip eram instalados.<br />Alguns tinham erro por falta de pacotes dev do linux e consequentemente não compilavam.<br />Outros nunca serão pois há uma pequena diferença entre versões de SO e pacotes.<br />Neste script eu estou guardando numa tabela na base <b>sqLite</b> os pacotes dev por computador.|
 |a+b||[TODO](https://github.com/freric-51/scripts/blob/main/TODO.md)|
+|[Network](https://github.com/freric-51/scripts/tree/main/Network)|Material para manter a minha rede funcionando|
