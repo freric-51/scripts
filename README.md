@@ -3,6 +3,13 @@
 ## My small scripts. :smirk:
 
 ~~~DOSbatch
+x
+~~~
+
+~~~Linux
+Y
+~~~
+
 ||Script|Desc. :brazil:|
 |:-:|-----:|:-----|
 ||[MS DOS](https://github.com/freric-51/scripts/tree/main/MS%20DOS)|Voltando aos anos 1990 :hourglass:|
