@@ -2,14 +2,15 @@
 
 ## My small scripts. :smirk:
 
-~~~DOSbatch
+~~~dosbatch
 x
 ~~~
 
-~~~Linux
+~~~linux
 Y
 ~~~
 
+~~~dos
 ||Script|Desc. :brazil:|
 |:-:|-----:|:-----|
 ||[MS DOS](https://github.com/freric-51/scripts/tree/main/MS%20DOS)|Voltando aos anos 1990 :hourglass:|
