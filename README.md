@@ -2,21 +2,21 @@
 
 ## My small scripts. :smirk:
 
-~~~dosbatch
+~~~batch
 x
 ~~~
 
-~~~linux
+~~~bash
 Y
 ~~~
 
-~~~dos
+~~~batch
 ||Script|Desc. :brazil:|
 |:-:|-----:|:-----|
 ||[MS DOS](https://github.com/freric-51/scripts/tree/main/MS%20DOS)|Voltando aos anos 1990 :hourglass:|
 ~~~
 
-~~~Linux bash
+~~~bash
 ||Script|Desc. :brazil:|
 |:-:|-----:|:-----|
 |a|update_pips.py|Eu uso este script para tentar igualar/achar as diferenças entre meus computadores.<br /> Atualmente são 3:<br /> 1. um laptop com Ubuntu e <b>Xfce</b> onde programo e escuto musica<br /> 2. um desktop com <b>Zorin OS</b> onde coloquei um servidor <b>WEB</b> e <b>MySQL</b> para meus estudos<br /> 3. um desktop com Ubuntu e <b>XFce</b> para os hospedes (**netos: :girl::girl: :girl: :boy::girl: :boy:**)<br />|
