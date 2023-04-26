@@ -67,7 +67,8 @@ while [ 1 -ne $SAI_n ]; do
 	cnn=$(connected $placa)
 
 	if [ $cnn -eq "1" ]; then
-		echo -e "$cnn online - `date +%H:%M:%S`"
+		sleep 0.1
+        # echo -e "$cnn online - `date +%H:%M:%S`"
 	else
 		echo -e "$cnn offline - `date +%H:%M:%S`"
         sleep 0.1
