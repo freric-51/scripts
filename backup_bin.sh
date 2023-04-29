@@ -221,7 +221,7 @@ while
     transfer_files
     dropbox_start
 	if [ ! -z "$1" ] ; then
-		t=$(($RANDOM % 10 + 5))
+		t=$(($RANDOM % 3 + 3))
         if [ $primeira_vez == 1 ] ; then
             t=1
             primeira_vez=0
