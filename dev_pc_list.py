@@ -10,9 +10,10 @@ import subprocess
 import sqlite3
 
 # Constants
-NODE_ME=os.uname().nodename
-CMD_RET_DEV='apt list *-dev --installed'
-DEV_INSTALL_FILE= pathlib.Path.home().joinpath('bin','dev_list.sh')
+NODE_ME = os.uname().nodename
+CMD_RET_DEV = 'apt list *-dev --installed'
+DEV_INSTALL_FILE = pathlib.Path.home().joinpath('bin', 'dev_list.sh')
+
 
 def create_db_connection(ref_file):
     """create or connect to sqlite file
@@ -29,6 +30,7 @@ def create_db_connection(ref_file):
     #     if conn:
     #         conn.close()
 
+
 def create_db_tables(connection):
     """ create table if not done yet
     :param ref_cur: cursor
@@ -42,9 +44,10 @@ def create_db_tables(connection):
     ref_cur.execute( sql_cmd )
     connection.commit()
 
+
 def get_packs(cmd):
     """    executa o comando (cmd) e limpa o retorno que vem do shell    """
-    (ret_status,ret_packs)=subprocess.getstatusoutput(cmd)
+    (ret_status, ret_packs)=subprocess.getstatusoutput(cmd)
     if ret_status==1:
         id_error = 1
     elif ret_status>1:
@@ -58,13 +61,14 @@ def get_packs(cmd):
     for data in list_durty:
         try:
             data=data.split()[0].lower()
-            if data not in (['','warning:','listing...']):
+            if data not in (['','warning:', 'listing...']):
                 list_clean.append(data.split('/')[0])
         except Exception:
             pass
     return list_clean
 
-def store_dev_packs(connection,machine,packs):
+
+def store_dev_packs(connection, machine, packs):
     """ store local dev packs
         :param connection: connection to sqlite file
         :param machine: machine name
@@ -77,6 +81,7 @@ def store_dev_packs(connection,machine,packs):
         db_cursor.execute(sql)
     connection.commit()
 
+
 def create_install_dev(file_name,dev_all):
     """ re-escrever (file) """
     # a=append w=write r=read / binary x text
@@ -86,10 +91,11 @@ def create_install_dev(file_name,dev_all):
         file_obj.write('sudo apt install --assume-yes ') # first line needs a little push ;)
         file_obj.writelines('\nsudo apt install --assume-yes '.join(dev_all) )
         file_obj.close
-        os.chmod (file_name,stat.S_IRWXU )
+        os.chmod (file_name, stat.S_IRWXU )
+
 
 # DB File
-file_db = pathlib.Path.home().joinpath('bin','dev_list.db')
+file_db = pathlib.Path.home().joinpath('bin', 'dev_list.db')
 conn=create_db_connection(file_db)
 if not conn:
     sys.exit()
@@ -101,7 +107,7 @@ create_db_tables(conn)
 local_dev_packs=get_packs(CMD_RET_DEV)
 
 # store local dev packs
-store_dev_packs(conn,NODE_ME,local_dev_packs)
+store_dev_packs(conn, NODE_ME, local_dev_packs)
 
 # cursor
 cur = conn.cursor()
@@ -111,7 +117,8 @@ SQL_DIST = SQL_DIST + ' select dev_pack_name FROM debian_packs where machine = '
 SQL_DIST = SQL_DIST + "'" + NODE_ME + "');"
 cur.execute(SQL_DIST)
 FIRST_ROW = True
-list_cur=[]
+list_cur = []
+
 for row in cur.fetchall():
     if FIRST_ROW:
         FIRST_ROW = False
@@ -124,7 +131,7 @@ if FIRST_ROW:
     FIRST_ROW = False
     print('All dev packs are installed here.')
 else:
-    create_install_dev(DEV_INSTALL_FILE,list_cur)
+    create_install_dev(DEV_INSTALL_FILE, list_cur)
 
 if conn:
     conn.close()

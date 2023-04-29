@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Freitas April 22 2023
+# Freitas April 26 2023
 # kernel  5.15.0-70-generic
 # keep wifi working
 # if it stops then off/on the radio to force reconnecting
@@ -81,7 +81,7 @@ while [ 1 -ne $SAI_n ]; do
         nmcli radio wifi on
 	fi
 
-	trap $SAI_n=1 SIGHUP SIGINT SIGTERM
+	trap SAI_n=1 SIGHUP SIGINT SIGTERM
 	if [ 1 -eq $SAI_n ]; then
         echo "saindo."
 	else

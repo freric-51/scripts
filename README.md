@@ -2,6 +2,8 @@
 
 ## My small scripts. :smirk:
 
+Os scripts em **Python** foram revisados pelo **flake8**. Eu abandonei o uso do **pylint** pois achei-o muito complacente.
+
 ||Script|Desc. :brazil:|
 |:-:|-----:|:-----|
 ||[Network](https://github.com/freric-51/scripts/tree/main/Network)|Material para manter a minha rede funcionando|
