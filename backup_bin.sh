@@ -133,6 +133,7 @@ function transfer_files {
     remove_file "$A$C" "$B$C" "avidemux_2.7.6.appImage"
     remove_file "$A$C" "$B$C" "avidemux_2.7.8.appImage"
     remove_file "$A$C" "$B$C" "avidemux_2.8.0.appImage"
+    remove_file "$A$C" "$B$C" "balenaEtcher-1.5.45-x64.AppImage"
     remove_file "$A$C" "$B$C" "ClipGrab-3.8.14-x86_64.AppImage"
     remove_file "$A$C" "$B$C" "ClipGrab-3.9.6-x86_64.AppImage"
     remove_file "$A$C" "$B$C" "CPU-X_v3.2.4_x86_64.AppImage"
