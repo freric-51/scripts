@@ -4,6 +4,20 @@
 # keep wifi working
 # if it stops then off/on the radio to force reconnecting
 
+#	30 FG ~ 40 BG ~ n + 60 Bright
+#	30 Black	31 Red		32 Green	33 Yellow
+#	34 Blue		35 Magenta	36 Cyan		37 White
+COLOR_RESET='\033[0m'
+COLOR_RED='\033[31m'
+COLOR_GREEN='\033[32m'
+COLOR_YELLLOW='\033[33m'
+COLOR_BLUE='\033[34m'
+COLOR_WHITE='\033[37m'
+COLOR_WHITE_ON_BLACK='\033[37;40m'
+COLOR_BLACK_ON_WHITE='\033[30;47m'
+COLOR_RED_ON_GREEN='\033[31;42m'
+COLOR_WHITE_ON_CYAN='\033[37;46m'
+
 function find_device {
     # wifi devices start with WL
 	cd "/sys/class/net/"
@@ -59,7 +73,7 @@ function connected {
 # =======
 
 placa=$(find_device)
-echo -e "Monitoração wifi de $placa"
+echo -e "${COLOR_RED} Monitoração wifi de $placa ${COLOR_RESET}"
 
 SAI_n=999
 while [ 1 -ne $SAI_n ]; do
@@ -72,21 +86,23 @@ while [ 1 -ne $SAI_n ]; do
 	else
 		echo -e "$cnn offline - `date +%H:%M:%S`"
         sleep 0.1
-        echo -e "\tstopping wifi ..."
+        echo -e "${COLOR_RED} \tstopping wifi ... ${COLOR_RESET}"
         # sudo service network-manager stop
         nmcli radio wifi off
         sleep 5
-        echo -e "\tstarting wifi ..."
+        echo -e "${COLOR_RED} \tstarting wifi ... ${COLOR_RESET}"
         # sudo service network-manager start
         nmcli radio wifi on
 	fi
 
 	trap SAI_n=1 SIGHUP SIGINT SIGTERM
 	if [ 1 -eq $SAI_n ]; then
-        echo "saindo."
+        echo -e "${COLOR_RED} saindo. ${COLOR_RESET}"
 	else
     	for i in {0..4}; do
             sleep 11
         done
 	fi
 done
+
+echo -e "${COLOR_RESET}"

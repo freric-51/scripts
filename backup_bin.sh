@@ -26,7 +26,7 @@ function ifs_restore {
 }
 
 function exe_backup {
-    echo -e "${COLOR_YELLLOW}-$1 x $2-${COLOR_RESET}"
+    # echo -e "${COLOR_YELLLOW}-$1 x $2-${COLOR_RESET}"
 
     if ! [ -d "$1" ]; then
         mkdir "$1"
@@ -45,10 +45,10 @@ function exe_backup {
     fi
 
     if [ "$ret1" != "" ]; then
-        echo -e "$ret1"
+        echo -e "${COLOR_BLUE} $ret1 ${COLOR_RESET}"
     fi
     if [ "$ret2" != "" ]; then
-        echo -e "$ret2"
+        echo -e "${COLOR_BLUE} $ret2 ${COLOR_RESET}"
     fi
 }
 
@@ -190,6 +190,16 @@ function transfer_files {
 
         C="/ric.local/public_html/user_icons"
         exe_backup "$A$C" "$B$C"
+
+        A="/etc/apache2"
+        B="$HOME/Dropbox/linux/apache/etc/apache2"
+        C=""
+        exe_backup "$A$C" "$B$C" "ports.conf"
+        C="/conf-available"
+        exe_backup "$A$C" "$B$C" "php7.4-cgi.conf"
+        C="/sites-available"
+        exe_backup "$A$C" "$B$C" "adminer.conf"
+        exe_backup "$A$C" "$B$C" "ric.local.conf"
     fi
 
 }
@@ -211,9 +221,9 @@ function dropbox_stop {
 # ====================
 # 		Process
 # ====================
-
-echo -e "----------------------------\nInicio... verifique manualmente arquivos que devem ser apagados!\n----------------------------"
-
+echo -e "${COLOR_BLUE}----------------------------"
+echo -e "Inicio... verifique manualmente arquivos que devem ser apagados!"
+echo -e "----------------------------${COLOR_RESET}"
 # ##################################################
 ifs_set		# to accept space in file names
 primeira_vez=1
@@ -227,7 +237,7 @@ while
             t=1
             primeira_vez=0
         fi
-		echo -e "wait $t minutes from $(date)"
+        # echo -e "${COLOR_BLUE} wait $t minutes from $(date) ${COLOR_RESET}"
 		let t=t*60
  		sleep $t
 	fi
@@ -236,6 +246,6 @@ do :; done
 
 ifs_restore	# to restore $IFS
 # ##################################################
+echo -e "${COLOR_BLUE} \nFim...\n ${COLOR_RESET}"
 
-echo -e "\nFim...\n"
 #	kill -SIGKILL $PPID
