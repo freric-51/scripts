@@ -26,8 +26,6 @@ function ifs_restore {
 }
 
 function exe_backup {
-    # echo -e "${COLOR_YELLLOW}-$1 x $2-${COLOR_RESET}"
-
     if ! [ -d "$1" ]; then
         mkdir "$1"
     fi
@@ -37,6 +35,7 @@ function exe_backup {
     fi
 
     if [ -z "$3" ]; then
+        # rsync --checksum --times --atimes --archive
         ret1=$(cp --verbose --preserve --update "$1"/*.* "$2"  2>/dev/null)
         ret2=$(cp --verbose --preserve --update "$2"/*.* "$1"  2>/dev/null)
     else
@@ -45,10 +44,10 @@ function exe_backup {
     fi
 
     if [ "$ret1" != "" ]; then
-        echo -e "${COLOR_BLUE} $ret1 ${COLOR_RESET}"
+        echo -e "${COLOR_BLUE}$ret1 ${COLOR_RED}$(date)${COLOR_RESET}"
     fi
     if [ "$ret2" != "" ]; then
-        echo -e "${COLOR_BLUE} $ret2 ${COLOR_RESET}"
+        echo -e "${COLOR_BLUE}$ret2 ${COLOR_RED}$(date)${COLOR_RESET}"
     fi
 }
 
@@ -202,6 +201,16 @@ function transfer_files {
         exe_backup "$A$C" "$B$C" "ric.local.conf"
     fi
 
+    # GitHub
+    A="$HOME/Documents/code/GitHub/"
+    B="scripts"
+    declare -a pathsArray=("automotive" "bootcamps" "collaboration" "Csharp" "Excel-VBA" "SQL" "uCPU" "Visual-Basic")
+    for paths in ${pathsArray[@]}; do
+        if [ -d "$A$paths" ]; then
+            exe_backup "$A$B" "$A$paths" "git_repo.sh"
+        fi
+    done
+
 }
 
 function dropbox_start {
@@ -221,9 +230,11 @@ function dropbox_stop {
 # ====================
 # 		Process
 # ====================
-echo -e "${COLOR_BLUE}----------------------------"
-echo -e "Inicio... verifique manualmente arquivos que devem ser apagados!"
-echo -e "----------------------------${COLOR_RESET}"
+PROGRAM_NAME=`basename $0 | tr 'a-z' 'A-Z'`
+echo -e "$PROGRAM_NAME${COLOR_BLUE} v-2023${COLOR_RESET}"
+echo -e "${COLOR_BLUE}----------------------------${COLOR_RESET}"
+echo -e "${COLOR_BLUE}Inicio... verifique manualmente arquivos que devem ser apagados!${COLOR_RESET}"
+echo -e "${COLOR_BLUE}----------------------------${COLOR_RESET}"
 # ##################################################
 ifs_set		# to accept space in file names
 primeira_vez=1
