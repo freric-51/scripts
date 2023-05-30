@@ -68,6 +68,7 @@ branchs)
     echo "git add"
     echo "git commit"
     echo -e "git push (após commit)${COLOR_RESET}"
+    echo -e "${COLOR_BLUE}git_repo.sh status push ${COLOR_RESET}/ pull branchss"
     ;;
 esac
 

@@ -137,6 +137,7 @@ function transfer_files {
     remove_file "$A$C" "$B$C" "ClipGrab-3.9.6-x86_64.AppImage"
     remove_file "$A$C" "$B$C" "CPU-X_v3.2.4_x86_64.AppImage"
     remove_file "$A$C" "$B$C" "CPU-X-v4.0.1-x86_64.AppImage"
+    remove_file "$A$C" "$B$C" "CPU-X-v4.4.0-x86_64.AppImage"
     remove_file "$A$C" "$B$C" "Franz-5.9.2.AppImage"
     remove_file "$A$C" "$B$C" "helio-3.1-x64.AppImage"
 
@@ -204,7 +205,7 @@ function transfer_files {
     # GitHub
     A="$HOME/Documents/code/GitHub/"
     B="scripts"
-    declare -a pathsArray=("automotive" "bootcamps" "collaboration" "Csharp" "Excel-VBA" "SQL" "uCPU" "Visual-Basic")
+    declare -a pathsArray=("automotive" "bootcamps" "collaboration" "Csharp" "Excel-VBA" "SQL" "uCPU" "Visual-Basic" "freric-51.github.io")
     for paths in ${pathsArray[@]}; do
         if [ -d "$A$paths" ]; then
             exe_backup "$A$B" "$A$paths" "git_repo.sh"

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Freitas 05/27/2023
+# trap null return from ping with 'if -z' after line 80
+
 # Freitas May 22 2023
 # if there is no wifi then exit
 
@@ -27,6 +30,11 @@ function find_device {
     # wifi devices start with WL
 	cd "/sys/class/net/"
 	ls -d wl*
+}
+
+function mac_AP {
+    RUN=`iwconfig $1 2>/dev//null | grep -i access | sed -e 's/  */ /g' | cut -d":" -f4-`
+    echo $RUN
 }
 
 function connected {
@@ -76,8 +84,13 @@ function connected {
                     # 1 pacotes transmitidos, 0 recebidos, 100% perda de pacote, tempo 0ms
                     # 1 packets transmitted, 1 received, 0% packet loss, time 0ms
                     # RECEbido ~ RECEived
-                    Received=`ping -c1 -q -W10 1.1.1.1 | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
-                    if [ $Received -eq 0 ]; then FUNCTIONAL=0; else FUNCTIONAL=1; fi
+                    # com 2>/dev/null ping retorna vazio se a conexão não ocorrer, tratado com ' if -z'
+                    Received=`ping -c1 -q -W10 1.1.1.1 2>/dev/null | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+                    if [[ -z $Received ]] ; then
+                        FUNCTIONAL=0
+                    else
+                        if [ $Received -eq 0 ]; then FUNCTIONAL=0; else FUNCTIONAL=1; fi
+                    fi
                 fi
             else
                 # error executing shell
@@ -108,14 +121,17 @@ fi
 echo -e "${COLOR_RED}Monitoração wifi de $placa ${COLOR_RESET}"
 
 SAI_n=999
+MAC=""
 while [ 1 -ne $SAI_n ]; do
 	cnn=$(connected $placa)
 
 	if [ $cnn -eq "1" ] ; then
 		sleep 0.1
+        MAC=$(mac_AP $placa)
+        # echo -e "mac = $MAC"
         # echo -e "$cnn online - `date +%H:%M:%S`"
 	else
-		echo -e "$cnn offline - `date +%H:%M:%S`"
+		echo -e "$cnn offline - `date +%H:%M:%S` at $MAC"
         sleep 0.1
         echo -e "${COLOR_RED}\tstopping wifi ... ${COLOR_RESET}"
         # sudo service network-manager stop

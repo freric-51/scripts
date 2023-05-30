@@ -169,7 +169,7 @@ def remove_pip_pack(p_installed, p_not_accepted):
 
 
 # -----------------------------------------------------------------
-print('Freitas 2023/04/26 11h26')
+print('Freitas 2023/05')
 
 pack_installed = passo_01()
 print('\tReturned : ' + str(len(pack_installed)) + ' instaled\n')
