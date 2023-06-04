@@ -20,8 +20,10 @@ echo -e "$PROGRAM_NAME  ${COLOR_BLUE}v-2023${COLOR_RESET}"
 
 dir_base=$(pwd | rev | cut -d"/" -f2- | rev)
 dir_repo="/$(pwd | rev |cut -d"/" -f1 | rev)"
+json_file="git_controle.json"
 
 # echo -e "\n"
+# sudo apt install jq
 
 case $1 in
 clone)
@@ -52,7 +54,8 @@ pull)
 push)
     cd "$dir_base$dir_repo"
     git status
-    git commit -a -m "file synchronization"
+    json_msg=$(jq '.message' $json_file)
+    git commit -a -m """$json_msg"""
     #git push REPO main
     git push
 	;;
