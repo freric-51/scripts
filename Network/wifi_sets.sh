@@ -69,9 +69,7 @@ function is_ping() {
     # RECEbido ~ RECEived
     # com 2>/dev/null ping retorna vazio se a conexão não ocorrer, tratado com ' if -z'
     Received=`ping -c1 -q -W10 1.1.1.1 2>/dev/null | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
-    if [[ -z $Received ]]; then
-        Received=0
-    fi
+    if [[ -z $Received ]]; then Received=0; fi
     echo $Received
 }
 
@@ -93,9 +91,7 @@ function conn_to_first_wifi() {
 function Signal_Level() {
     # Quality=`iwconfig $1 2>/dev/null | grep -i 'link quality' | awk '{ print $2 }' | cut -d"=" -f2 | cut -d"/" -f1`
     level=`iwconfig $1 2>/dev/null | grep -i 'link quality' | awk '{ print $4 }' | cut -d"=" -f2 | cut -d"/" -f1`
-    if [[ -z $level ]]; then
-        level=-999
-    fi
+    if [[ -z $level ]]; then level=-999; fi
     echo $level
 }
 
@@ -109,48 +105,36 @@ function connected {
     # NETFLAGS=`ifconfig $placa | grep -i flags | cut -f1 -d\< | cut -f2 -d=`
     # if [ $NETFLAGS -eq 4098 ]; then
 
-    turn_on_network
-    turn_on_radio
-    ESSID=current_ESSID
+    FUNCTIONAL=1
 
+    OK=$(turn_on_network)
+    if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
 
+    OK=$(turn_on_radio)
+    if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
 
-    if  ! [[ -z $ESSID ]] ; then
-        if [ $ESSID == 'ESSID:off/any' ]; then
-            # try to connect to first wifi ESSID
-            conn_to_first_wifi $1
-            sleep 20
-            FUNCTIONAL=0
-        else
-            SigLevel=Signal_Level $1
+    ESSID=$(current_ESSID $1)
+    if  [ '""' == "$ESSID" ] ; then  FUNCTIONAL=0; fi
 
-            RESULT=$?
-            if [ $RESULT -eq 0 ] ; then
-                if [ $SigLevel -lt $MENOR_SINAL ]; then
-                    FUNCTIONAL=0
-                else
-                    Received=is_ping
-                    if [[ -z $Received ]] ; then
-                        FUNCTIONAL=0
-                    else
-                        if [ $Received -eq 0 ]; then FUNCTIONAL=0; else FUNCTIONAL=1; fi
-                    fi
-                fi
-            else
-                # error executing shell
-                FUNCTIONAL=0
-            fi
-        fi
-    else
-        # error executing shell
+    if [ "$ESSID" == 'off/any' ]; then
+        # try to connect to first wifi ESSID
+        conn_to_first_wifi $1
+        sleep 20
         FUNCTIONAL=0
+    else
+        SigLevel=$(Signal_Level $1)
+        if [ $SigLevel -lt $MENOR_SINAL ]; then FUNCTIONAL=0; fi
+
+        Received=$(is_ping)
+        if [ $Received -eq 0 ]; then FUNCTIONAL=0; fi
     fi
+
     echo $FUNCTIONAL
 }
 
-# =======
+# #######################
 #  MAIN
-# =======
+# #######################
 
 # $0 The name of the bash script.
 PROGRAM_NAME=`basename $0 | tr 'a-z' 'A-Z'`
@@ -164,9 +148,11 @@ fi
 
 echo -e "${COLOR_RED}Monitoração wifi de $placa ${COLOR_RESET}"
 
-TEST=1
-    # Teste das funções
-    if [ $TEST -eq 1 ]; then
+# ===================
+# Teste das funções
+# ===================
+TEST=0
+if [ $TEST -eq 1 ]; then
     echo $(turn_on_network)
     echo $(turn_on_radio)
 
@@ -185,17 +171,16 @@ TEST=1
     echo "FIM"
     exit
 fi
+# ==============================================================================
 
 SAI_n=999
-MAC=""
+MAC=$(mac_AP $placa)
+
 while [ 1 -ne $SAI_n ]; do
 	cnn=$(connected $placa)
-
-	if [ $cnn -eq "1" ] ; then
+	if [ "$cnn" -eq "1" ] ; then
 		sleep 0.1
         MAC=$(mac_AP $placa)
-        # echo -e "mac = $MAC"
-        # echo -e "$cnn online - `date +%H:%M:%S`"
 	else
 		echo -e "$cnn offline - `date +%H:%M:%S` at $MAC"
         sleep 0.1
@@ -208,15 +193,17 @@ while [ 1 -ne $SAI_n ]; do
         nmcli radio wifi on
 	fi
 
-	trap SAI_n=1 SIGHUP SIGINT SIGTERM
-	if [ 1 -eq $SAI_n ]; then
-        echo -e "${COLOR_RED}saindo. ${COLOR_RESET}"
-	else
-    	for i in {0..6}; do
+    for i in {0..6}; do
+        trap SAI_n=1 SIGHUP SIGINT SIGTERM
+        if [ 1 -eq $SAI_n ]; then
+            echo -e "${COLOR_RED}saindo.${COLOR_RESET}"
+            sleep 3
+            break
+        else
             sleep 11
-        done
-	fi
+        fi
+    done
 
 done
 
-echo -e "${COLOR_RESET}"
+echo -e "Fim monitoramento da conexão wifi${COLOR_RESET}"
