@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # enp2s0 wlp2s0
 
 DEVS=`cat /proc/net/dev | grep : | cut -d":" -f1 | tr -d " "`

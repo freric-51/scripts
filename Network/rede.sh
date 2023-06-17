@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 if [ -e /etc/init.d/networking ]; then
 	sudo /etc/init.d/networking restart
 else

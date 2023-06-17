@@ -1,18 +1,6 @@
 #!/usr/bin/env bash
 
-#	30 FG ~ 40 BG ~ n + 60 Bright
-#	30 Black	31 Red		32 Green	33 Yellow
-#	34 Blue		35 Magenta	36 Cyan		37 White
-COLOR_RESET='\033[0m'
-COLOR_RED='\033[31m'
-COLOR_GREEN='\033[32m'
-COLOR_YELLLOW='\033[33m'
-COLOR_BLUE='\033[34m'
-COLOR_WHITE='\033[37m'
-COLOR_WHITE_ON_BLACK='\033[37;40m'
-COLOR_BLACK_ON_WHITE='\033[30;47m'
-COLOR_RED_ON_GREEN='\033[31;42m'
-COLOR_WHITE_ON_CYAN='\033[37;46m'
+source terminal_colors.sh
 
 # The IFS is an acronym for Internal Field Separator or Input Field Separator.
 SAVEIFS=$IFS
@@ -82,10 +70,11 @@ function transfer_files {
         exe_backup "$A$C" "$B$C" "backup_bin.sh"
         exe_backup "$A$C" "$B$C" "dev_pc_list.py"
         exe_backup "$A$C" "$B$C" "update_pips.py"
+        exe_backup "$A$C" "$B$C" "terminal_colors.sh"
     fi
 
     # Net
-    # movido para antes da sincronização de /bin pois há remoção de pacotes em /bim que foram copiados para /network
+    # movido para antes da sincronização de /bin pois há remoção de pacotes em /bin que foram copiados para /network
     A="$HOME/bin"
     B="$HOME/Dropbox/linux/bin"
     C="/Network"
@@ -102,6 +91,7 @@ function transfer_files {
         exe_backup "$A$C" "$B$C" "reinicia_impressoras.sh"
         exe_backup "$A$C" "$B$C" "vpn.sh"
         exe_backup "$A$C" "$B$C" "wifi_sets.sh"
+        exe_backup "$A$C" "$B$C" "terminal_colors.sh"
     fi
 
     A="$HOME/bin"
@@ -113,6 +103,15 @@ function transfer_files {
     remove_file "$A$C" "$B$C" "vpn.sh"
     remove_file "$A$C" "$B$C" "wifi_sets.sh"
     # Net fim
+
+    A="$HOME/bin/Network"
+    B="$HOME/bin"
+    if [ -d $A ]; then
+        cd "$A"
+        # -----------------------
+        C=""
+        exe_backup "$A$C" "$B$C" "terminal_colors.sh"
+    fi
 
     # =========================================
     A="$HOME/bin"

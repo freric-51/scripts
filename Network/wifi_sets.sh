@@ -11,20 +11,13 @@
 # keep wifi working
 # if it stops then off/on the radio to force reconnecting
 
+# Freitas Jun 17 2023
+# Split calls into  functions
 
-#	30 FG ~ 40 BG ~ n + 60 Bright
-#	30 Black	31 Red		32 Green	33 Yellow
-#	34 Blue		35 Magenta	36 Cyan		37 White
-COLOR_RESET='\033[0m'
-COLOR_RED='\033[31m'
-COLOR_GREEN='\033[32m'
-COLOR_YELLLOW='\033[33m'
-COLOR_BLUE='\033[34m'
-COLOR_WHITE='\033[37m'
-COLOR_WHITE_ON_BLACK='\033[37;40m'
-COLOR_BLACK_ON_WHITE='\033[30;47m'
-COLOR_RED_ON_GREEN='\033[31;42m'
-COLOR_WHITE_ON_CYAN='\033[37;46m'
+source terminal_colors.sh
+
+# percentagem de sinal considerado muito fraco
+MENOR_SINAL=-80
 
 function find_device {
     # wifi devices start with WL
@@ -33,8 +26,77 @@ function find_device {
 }
 
 function mac_AP {
-    RUN=`iwconfig $1 2>/dev//null | grep -i access | sed -e 's/  */ /g' | cut -d":" -f4-`
-    echo $RUN
+    MAC=`iwconfig $1 2>/dev//null | grep -i access | sed -e 's/  */ /g' | cut -d":" -f4-`
+    if [[ -z $MAC ]]; then
+        MAC="00:00:00:00"
+    fi
+    echo $MAC
+}
+
+function turn_on_network() {
+    NET=`nmcli networking`
+    if [ $NET == "disabled" ]; then
+        nmcli networking on
+        sleep 2
+    fi
+    NET=`nmcli networking`
+
+    if [ $NET == "enabled" ]; then NET=1; else NET=0; fi
+    echo $NET
+}
+
+function turn_on_radio() {
+    RADIO=`nmcli radio wifi`
+    if [ $RADIO == "disabled" ]; then
+        nmcli radio wifi on
+        sleep 20
+    fi
+    RADIO=`nmcli radio wifi`
+    if [ $RADIO == "enabled" ]; then RADIO=1; else RADIO=0; fi
+    echo $RADIO
+}
+
+function current_ESSID() {
+    # ESSID=`iwconfig $1 2>/dev/null | grep ESSID | cut -d" " -f8 `
+    # ESSID=`iwconfig $1 2>/dev/null | grep ESSID | cut -d":" -f2 | awk -F'"' '{print "ESSID:\"" $2 "\""}' `
+    ESSID=`iwconfig $1 2>/dev/null | grep ESSID | cut -d":" -f2 | awk -F'"' '{print "\"" $2 "\""}' `
+    echo $ESSID
+}
+
+function is_ping() {
+    # 1 pacotes transmitidos, 0 recebidos, 100% perda de pacote, tempo 0ms
+    # 1 packets transmitted, 1 received, 0% packet loss, time 0ms
+    # RECEbido ~ RECEived
+    # com 2>/dev/null ping retorna vazio se a conexão não ocorrer, tratado com ' if -z'
+    Received=`ping -c1 -q -W10 1.1.1.1 2>/dev/null | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+    if [[ -z $Received ]]; then
+        Received=0
+    fi
+    echo $Received
+}
+
+function conn_to_first_wifi() {
+    RUN=`nmcli device set $1 autoconnect yes`
+    # RUN=`nmcli con show | grep wifi | cut -d" " -f1 | head -n 1 | xargs -I{}  nmcli con up id {}`
+    RUN=`nmcli con show | grep wifi | cut -c-21 | sed -e 's/  */ /g'  | awk  '{print "\"" $0 "\""}' | sed -e 's/ " */"/g' | head -n 1 `
+    RUN=`echo $RUN | xargs -I{}  nmcli con up id {}  2>/dev/null`
+    if [[ -z $RUN ]]; then
+        # error
+        RUN=0
+    else
+        # Conexão ativada com sucesso (caminho D-Bus ativo: /org/freedesktop/NetworkManager/ActiveConnection/11)
+        RUN=1
+    fi
+     echo $RUN
+}
+
+function Signal_Level() {
+    # Quality=`iwconfig $1 2>/dev/null | grep -i 'link quality' | awk '{ print $2 }' | cut -d"=" -f2 | cut -d"/" -f1`
+    level=`iwconfig $1 2>/dev/null | grep -i 'link quality' | awk '{ print $4 }' | cut -d"=" -f2 | cut -d"/" -f1`
+    if [[ -z $level ]]; then
+        level=-999
+    fi
+    echo $level
 }
 
 function connected {
@@ -47,45 +109,27 @@ function connected {
     # NETFLAGS=`ifconfig $placa | grep -i flags | cut -f1 -d\< | cut -f2 -d=`
     # if [ $NETFLAGS -eq 4098 ]; then
 
-    NET=`nmcli networking`
-    if [ $NET == "disabled" ]; then
-        nmcli networking on
-        sleep 2
-    fi
+    turn_on_network
+    turn_on_radio
+    ESSID=current_ESSID
 
-    RADIO=`nmcli radio wifi`
-    if [ $RADIO == "disabled" ]; then
-        nmcli radio wifi on
-        sleep 20
-    fi
 
-    ESSID=`iwconfig $1 | grep ESSID | cut -d" " -f8 `
-    RESULT=$?
-    for ESSIDline in $ESSID; do
-        if [[ $ESSIDline == *"ESSID"* ]]; then
-            ESSID=`echo $ESSIDline | cut -d" " -f8 `
-        fi
-    done
 
-    if [ $RESULT -eq 0 ] ; then
+    if  ! [[ -z $ESSID ]] ; then
         if [ $ESSID == 'ESSID:off/any' ]; then
             # try to connect to first wifi ESSID
-            RUN=`nmcli device set $1 autoconnect yes`
-            RUN=`nmcli con show | grep wifi | cut -d" " -f1 | head -n 1 | xargs -I{}  nmcli con up id {}`
+            conn_to_first_wifi $1
             sleep 20
             FUNCTIONAL=0
         else
-            Quality=`iwconfig $1 | grep -i 'link quality' | awk '{ print $2 }' | cut -d"=" -f2 | cut -d"/" -f1`
+            SigLevel=Signal_Level $1
+
             RESULT=$?
             if [ $RESULT -eq 0 ] ; then
-                if [ $Quality -lt 20 ]; then
+                if [ $SigLevel -lt $MENOR_SINAL ]; then
                     FUNCTIONAL=0
                 else
-                    # 1 pacotes transmitidos, 0 recebidos, 100% perda de pacote, tempo 0ms
-                    # 1 packets transmitted, 1 received, 0% packet loss, time 0ms
-                    # RECEbido ~ RECEived
-                    # com 2>/dev/null ping retorna vazio se a conexão não ocorrer, tratado com ' if -z'
-                    Received=`ping -c1 -q -W10 1.1.1.1 2>/dev/null | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+                    Received=is_ping
                     if [[ -z $Received ]] ; then
                         FUNCTIONAL=0
                     else
@@ -120,6 +164,28 @@ fi
 
 echo -e "${COLOR_RED}Monitoração wifi de $placa ${COLOR_RESET}"
 
+TEST=1
+    # Teste das funções
+    if [ $TEST -eq 1 ]; then
+    echo $(turn_on_network)
+    echo $(turn_on_radio)
+
+    ESSID=$(current_ESSID $placa)
+    if  [ '""' == "$ESSID" ] ; then
+        echo "unable to connect to wifi"
+    else
+        echo $ESSID
+    fi
+
+    echo $(is_ping)
+    echo $(conn_to_first_wifi $placa)
+    echo $(Signal_Level $placa)
+    echo $(mac_AP $placa)
+
+    echo "FIM"
+    exit
+fi
+
 SAI_n=999
 MAC=""
 while [ 1 -ne $SAI_n ]; do
@@ -146,7 +212,7 @@ while [ 1 -ne $SAI_n ]; do
 	if [ 1 -eq $SAI_n ]; then
         echo -e "${COLOR_RED}saindo. ${COLOR_RESET}"
 	else
-    	for i in {0..4}; do
+    	for i in {0..6}; do
             sleep 11
         done
 	fi
