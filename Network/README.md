@@ -15,7 +15,7 @@
 
 |Script|Função inicial|
 |:-|:-|
-|wifi_sets.sh|Reanima minha conexão WIFI que para sozinha. Tenho rodando em todos os meus computadores|
+|wifi_sets.sh|Reanima minha conexão WIFI que para sozinha. Tenho rodando em todos os meus computadores ![Test Option](https://github.com/freric-51/scripts/blob/main/Network/wifi_sets.png)|
 |reinicia_impressoras.sh|reinicio o CUPS|
 |find_devices_in_my_net.sh|Um scan pela minha rede do meu laptop|
 |vpn.sh|Sequência de comandos para o protonvpn|
