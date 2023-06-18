@@ -78,7 +78,10 @@ function transfer_files {
     A="$HOME/bin"
     B="$HOME/Dropbox/linux/bin"
     C="/Network"
+
     exe_backup "$A$C" "$B$C"
+    # remove somente de 'Dropbox'
+    remove_file "$A$C/X" "$B$C" "DevicesInMyNet.txt"
 
     A="$HOME/Documents/code/GitHub/scripts/Network"
     B="$HOME/bin/Network"
@@ -92,7 +95,7 @@ function transfer_files {
         exe_backup "$A$C" "$B$C" "vpn.sh"
         exe_backup "$A$C" "$B$C" "wifi_sets.sh"
         exe_backup "$A$C" "$B$C" "terminal_colors.sh"
-        # remove somente de 'A'
+        # remove somente de 'GitHub'
         remove_file "$A$C" "$B$C/X" "DevicesInMyNet.txt"
     fi
 
