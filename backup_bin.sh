@@ -92,6 +92,8 @@ function transfer_files {
         exe_backup "$A$C" "$B$C" "vpn.sh"
         exe_backup "$A$C" "$B$C" "wifi_sets.sh"
         exe_backup "$A$C" "$B$C" "terminal_colors.sh"
+        # remove somente de 'A'
+        remove_file "$A$C" "$B$C/X" "DevicesInMyNet.txt"
     fi
 
     A="$HOME/bin"
