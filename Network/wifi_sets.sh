@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 
-# Freitas 05/27/2023
+# Freitas 2023 may
 # trap null return from ping with 'if -z' after line 80
-
-# Freitas May 22 2023
 # if there is no wifi then exit
 
-# Freitas April 26 2023
+# Freitas 2023 april
 # kernel  5.15.0-70-generic
 # keep wifi working
 # if it stops then off/on the radio to force reconnecting
 
-# Freitas Jun 17 2023
+# Freitas 2023 jun
 # Split calls into  functions
 
 source terminal_colors.sh
@@ -26,7 +24,8 @@ function find_device {
 }
 
 function mac_AP {
-    MAC=`iwconfig $1 2>/dev//null | grep -i access | sed -e 's/  */ /g' | cut -d":" -f4-`
+    placa=$1
+    MAC=`iwconfig $placa 2>/dev//null | grep -i access | sed -e 's/  */ /g' | cut -d":" -f4-`
     if [[ -z $MAC ]]; then
         MAC="00:00:00:00"
     fi
@@ -39,8 +38,8 @@ function turn_on_network() {
         nmcli networking on
         sleep 2
     fi
-    NET=`nmcli networking`
 
+    NET=`nmcli networking`
     if [ $NET == "enabled" ]; then NET=1; else NET=0; fi
     echo $NET
 }
@@ -51,15 +50,15 @@ function turn_on_radio() {
         nmcli radio wifi on
         sleep 20
     fi
+
     RADIO=`nmcli radio wifi`
     if [ $RADIO == "enabled" ]; then RADIO=1; else RADIO=0; fi
     echo $RADIO
 }
 
 function current_ESSID() {
-    # ESSID=`iwconfig $1 2>/dev/null | grep ESSID | cut -d" " -f8 `
-    # ESSID=`iwconfig $1 2>/dev/null | grep ESSID | cut -d":" -f2 | awk -F'"' '{print "ESSID:\"" $2 "\""}' `
-    ESSID=`iwconfig $1 2>/dev/null | grep ESSID | cut -d":" -f2 | awk -F'"' '{print "\"" $2 "\""}' `
+    placa=$1
+    ESSID=`iwconfig $placa 2>/dev/null | grep ESSID | cut -d":" -f2 | awk -F'"' '{print "\"" $2 "\""}' `
     echo $ESSID
 }
 
@@ -74,7 +73,8 @@ function is_ping() {
 }
 
 function conn_to_first_wifi() {
-    RUN=`nmcli device set $1 autoconnect yes`
+    placa=$1
+    RUN=`nmcli device set $placa autoconnect yes`
     # RUN=`nmcli con show | grep wifi | cut -d" " -f1 | head -n 1 | xargs -I{}  nmcli con up id {}`
     RUN=`nmcli con show | grep wifi | cut -c-21 | sed -e 's/  */ /g'  | awk  '{print "\"" $0 "\""}' | sed -e 's/ " */"/g' | head -n 1 `
     RUN=`echo $RUN | xargs -I{}  nmcli con up id {}  2>/dev/null`
@@ -89,22 +89,14 @@ function conn_to_first_wifi() {
 }
 
 function Signal_Level() {
-    # Quality=`iwconfig $1 2>/dev/null | grep -i 'link quality' | awk '{ print $2 }' | cut -d"=" -f2 | cut -d"/" -f1`
-    level=`iwconfig $1 2>/dev/null | grep -i 'link quality' | awk '{ print $4 }' | cut -d"=" -f2 | cut -d"/" -f1`
+    placa=$1
+    level=`iwconfig $placa 2>/dev/null | grep -i 'link quality' | awk '{ print $4 }' | cut -d"=" -f2 | cut -d"/" -f1`
     if [[ -z $level ]]; then level=-999; fi
     echo $level
 }
 
 function connected {
-    # parameter: device name
-    # return: 1= connected, 0= not
-
-    # 4163 0x1043 = UP,BROADCAST,RUNNING,        MULTICAST
-    # 4098 0x1002 =    BROADCAST,                MULTICAST
-    # 8843 0x228b = UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST
-    # NETFLAGS=`ifconfig $placa | grep -i flags | cut -f1 -d\< | cut -f2 -d=`
-    # if [ $NETFLAGS -eq 4098 ]; then
-
+    placa=$1
     FUNCTIONAL=1
 
     OK=$(turn_on_network)
@@ -113,16 +105,25 @@ function connected {
     OK=$(turn_on_radio)
     if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
 
-    ESSID=$(current_ESSID $1)
-    if  [ '""' == "$ESSID" ] ; then  FUNCTIONAL=0; fi
+    if [ $FUNCTIONAL -eq "1" ] ; then
+        ESSID=$(current_ESSID $placa)
+        if [ "$ESSID" == '""' ] ;      then FUNCTIONAL=2; fi
+        if [ "$ESSID" == 'off/any' ] ; then FUNCTIONAL=2; fi
+    fi
 
-    if [ "$ESSID" == 'off/any' ]; then
+    if [ $FUNCTIONAL -eq "2" ] ; then
         # try to connect to first wifi ESSID
-        conn_to_first_wifi $1
+        OK=$(conn_to_first_wifi $placa)
         sleep 20
-        FUNCTIONAL=0
-    else
-        SigLevel=$(Signal_Level $1)
+        if [ $OK -eq "0" ]; then
+            FUNCTIONAL=0;
+        else
+            FUNCTIONAL=1
+        fi
+    fi
+
+    if [ $FUNCTIONAL -eq "1" ] ; then
+        SigLevel=$(Signal_Level $placa)
         if [ $SigLevel -lt $MENOR_SINAL ]; then FUNCTIONAL=0; fi
 
         Received=$(is_ping)
@@ -189,8 +190,8 @@ while [ 1 -ne $SAI_n ]; do
         nmcli radio wifi off
         sleep 5
         echo -e "${COLOR_RED}\tstarting wifi ... ${COLOR_RESET}"
-        # sudo service network-manager start
-        nmcli radio wifi on
+        ret=turn_on_network
+        ret=turn_on_radio
 	fi
 
     for i in {0..6}; do
