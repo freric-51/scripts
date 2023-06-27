@@ -48,7 +48,7 @@ function turn_on_radio() {
     RADIO=`nmcli radio wifi`
     if [ $RADIO == "disabled" ]; then
         nmcli radio wifi on
-        sleep 20
+        sleep 10
     fi
 
     RADIO=`nmcli radio wifi`
@@ -101,9 +101,11 @@ function connected {
 
     OK=$(turn_on_network)
     if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
+    sleep 3
 
     OK=$(turn_on_radio)
     if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
+    sleep 3
 
     if [ $FUNCTIONAL -eq "1" ] ; then
         ESSID=$(current_ESSID $placa)
@@ -179,22 +181,26 @@ MAC=$(mac_AP $placa)
 
 while [ 1 -ne $SAI_n ]; do
 	cnn=$(connected $placa)
+    ciclos_de_espera=6
 	if [ "$cnn" -eq "1" ] ; then
 		sleep 0.1
         MAC=$(mac_AP $placa)
+        ciclos_de_espera=6
 	else
 		echo -e "$cnn offline - `date +%H:%M:%S` at $MAC"
         sleep 0.1
         echo -e "${COLOR_RED}\tstopping wifi ... ${COLOR_RESET}"
         # sudo service network-manager stop
         nmcli radio wifi off
-        sleep 5
+        sleep 2
         echo -e "${COLOR_RED}\tstarting wifi ... ${COLOR_RESET}"
         ret=turn_on_network
+        sleep 3
         ret=turn_on_radio
+        ciclos_de_espera=3
 	fi
 
-    for i in {0..6}; do
+    for i in {0..$ciclos_de_espera}; do
         trap SAI_n=1 SIGHUP SIGINT SIGTERM
         if [ 1 -eq $SAI_n ]; then
             echo -e "${COLOR_RED}saindo.${COLOR_RESET}"
