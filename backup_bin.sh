@@ -148,6 +148,14 @@ function transfer_files {
     # -------------------------------------------------------------
     C="/Converte"
     exe_backup "$A$C" "$B$C"
+    remove_file "$A$C" "$B$C" "watermark.txt"
+    remove_file "$A$C" "$B$C" "remover senha pdf.txt"
+    remove_file "$A$C" "$B$C" "video 1080 to 720.txt"
+    remove_file "$A$C" "$B$C" "volume video.txt"
+    remove_file "$A$C" "$B$C" "png2pdf.sh"
+
+    C="/Converte/HowTo"
+    exe_backup "$A$C" "$B$C"
 
     # -------------------------------------------------------------
     C="/filter_torrent"

@@ -36,8 +36,8 @@ function turn_on_network() {
     NET=`nmcli networking`
     if [ $NET == "disabled" ]; then
         nmcli networking on
-        sleep 2
     fi
+    sleep 3
 
     NET=`nmcli networking`
     if [ $NET == "enabled" ]; then NET=1; else NET=0; fi
@@ -48,8 +48,8 @@ function turn_on_radio() {
     RADIO=`nmcli radio wifi`
     if [ $RADIO == "disabled" ]; then
         nmcli radio wifi on
-        sleep 10
     fi
+    sleep 3
 
     RADIO=`nmcli radio wifi`
     if [ $RADIO == "enabled" ]; then RADIO=1; else RADIO=0; fi
@@ -101,11 +101,9 @@ function connected {
 
     OK=$(turn_on_network)
     if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
-    sleep 3
 
     OK=$(turn_on_radio)
     if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
-    sleep 3
 
     if [ $FUNCTIONAL -eq "1" ] ; then
         ESSID=$(current_ESSID $placa)
@@ -151,9 +149,9 @@ fi
 
 echo -e "${COLOR_RED}Monitoração wifi de $placa ${COLOR_RESET}"
 
-# ===================
+# ==============================================================================
 # Teste das funções
-# ===================
+# ==============================================================================
 TEST=0
 if [ $TEST -eq 1 ]; then
     echo $(turn_on_network)
