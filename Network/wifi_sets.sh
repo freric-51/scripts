@@ -67,7 +67,7 @@ function is_ping() {
     # 1 packets transmitted, 1 received, 0% packet loss, time 0ms
     # RECEbido ~ RECEived
     # com 2>/dev/null ping retorna vazio se a conexão não ocorrer, tratado com ' if -z'
-    Received=`ping -c1 -q -W10 1.1.1.1 2>/dev/null | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+    Received=`ping -c1 -q -W10 8.8.8.8 2>/dev/null | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
     if [[ -z $Received ]]; then Received=0; fi
     echo $Received
 }
@@ -127,6 +127,10 @@ function connected {
         if [ $SigLevel -lt $MENOR_SINAL ]; then FUNCTIONAL=0; fi
 
         Received=$(is_ping)
+        if [ $Received -eq 0 ]; then
+            sleep 3
+            Received=$(is_ping)
+        fi
         if [ $Received -eq 0 ]; then FUNCTIONAL=0; fi
     fi
 
