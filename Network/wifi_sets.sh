@@ -15,7 +15,8 @@
 source terminal_colors.sh
 
 # percentagem de sinal considerado muito fraco
-MENOR_SINAL=-80
+MENOR_SINAL=-90
+MOTIVO="2023-07-24"
 
 function find_device {
     # wifi devices start with WL
@@ -35,24 +36,36 @@ function mac_AP {
 function turn_on_network() {
     NET=`nmcli networking`
     if [ $NET == "disabled" ]; then
+        MOTIVO="${MOTIVO}, Net was disabled."
         nmcli networking on
+        sleep 3
     fi
-    sleep 3
 
     NET=`nmcli networking`
-    if [ $NET == "enabled" ]; then NET=1; else NET=0; fi
+    if [ $NET == "enabled" ]; then
+        NET=1
+    else
+        MOTIVO="${MOTIVO}, Falha nmcli - $NET - 2a tentativa."
+        NET=0
+    fi
     echo $NET
 }
 
 function turn_on_radio() {
     RADIO=`nmcli radio wifi`
     if [ $RADIO == "disabled" ]; then
+        MOTIVO="${MOTIVO}, Radio founded off."
         nmcli radio wifi on
+        sleep 10
     fi
-    sleep 3
 
     RADIO=`nmcli radio wifi`
-    if [ $RADIO == "enabled" ]; then RADIO=1; else RADIO=0; fi
+    if [ $RADIO == "enabled" ]; then
+        RADIO=1
+    else
+        MOTIVO="${MOTIVO}, Falha radio - $RADIO - 2a tentativa."
+        RADIO=0
+    fi
     echo $RADIO
 }
 
@@ -67,8 +80,11 @@ function is_ping() {
     # 1 packets transmitted, 1 received, 0% packet loss, time 0ms
     # RECEbido ~ RECEived
     # com 2>/dev/null ping retorna vazio se a conexão não ocorrer, tratado com ' if -z'
-    Received=`ping -c1 -q -W10 8.8.8.8 2>/dev/null | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
-    if [[ -z $Received ]]; then Received=0; fi
+    Received=`ping -c1 -q -W10 8.8.4.4 2>/dev/null | sed -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+    if [[ -z $Received ]]; then
+        MOTIVO="${MOTIVO}, No ping."
+        Received=0
+    fi
     echo $Received
 }
 
@@ -80,6 +96,7 @@ function conn_to_first_wifi() {
     RUN=`echo $RUN | xargs -I{}  nmcli con up id {}  2>/dev/null`
     if [[ -z $RUN ]]; then
         # error
+        MOTIVO="${MOTIVO}, Error nmcli get ESSID."
         RUN=0
     else
         # Conexão ativada com sucesso (caminho D-Bus ativo: /org/freedesktop/NetworkManager/ActiveConnection/11)
@@ -91,7 +108,10 @@ function conn_to_first_wifi() {
 function Signal_Level() {
     placa=$1
     level=`iwconfig $placa 2>/dev/null | grep -i 'link quality' | awk '{ print $4 }' | cut -d"=" -f2 | cut -d"/" -f1`
-    if [[ -z $level ]]; then level=-999; fi
+    if [[ -z $level ]]; then
+        MOTIVO="${MOTIVO}, Low level."
+        level=-999
+    fi
     echo $level
 }
 
@@ -100,38 +120,57 @@ function connected {
     FUNCTIONAL=1
 
     OK=$(turn_on_network)
-    if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
+    if [ $OK -eq "0" ]; then
+        MOTIVO="${MOTIVO}, turn_on_network ${OK}."
+        FUNCTIONAL=0
+    fi
 
     OK=$(turn_on_radio)
-    if [ $OK -eq "0" ]; then FUNCTIONAL=0; fi
+    if [ $OK -eq "0" ]; then
+        MOTIVO="${MOTIVO}, turn_on_radio ${OK}."
+        FUNCTIONAL=0
+    fi
 
     if [ $FUNCTIONAL -eq "1" ] ; then
         ESSID=$(current_ESSID $placa)
-        if [ "$ESSID" == '""' ] ;      then FUNCTIONAL=2; fi
-        if [ "$ESSID" == 'off/any' ] ; then FUNCTIONAL=2; fi
+        if [ "$ESSID" == '""' ] ;      then
+            FUNCTIONAL=2
+            MOTIVO="${MOTIVO}, ESSID vazio"
+        fi
+        if [ "$ESSID" == 'off/any' ] ; then
+            FUNCTIONAL=2
+            MOTIVO="${MOTIVO}, ESSID off any"
+        fi
     fi
 
     if [ $FUNCTIONAL -eq "2" ] ; then
         # try to connect to first wifi ESSID
         OK=$(conn_to_first_wifi $placa)
-        sleep 20
         if [ $OK -eq "0" ]; then
+            MOTIVO="${MOTIVO}, conn_to_first_wifi ${OK}."
             FUNCTIONAL=0;
         else
             FUNCTIONAL=1
+            MOTIVO="${MOTIVO}, Conseguiu coneccao com primeira wifi."
         fi
     fi
 
     if [ $FUNCTIONAL -eq "1" ] ; then
         SigLevel=$(Signal_Level $placa)
-        if [ $SigLevel -lt $MENOR_SINAL ]; then FUNCTIONAL=0; fi
+        if [ $SigLevel -lt $MENOR_SINAL ]; then
+            MOTIVO="${MOTIVO}, Sinal $SigLevel"
+            FUNCTIONAL=0
+        fi
 
         Received=$(is_ping)
         if [ $Received -eq 0 ]; then
             sleep 3
             Received=$(is_ping)
         fi
-        if [ $Received -eq 0 ]; then FUNCTIONAL=0; fi
+        if [ $Received -eq 0 ]; then
+            FUNCTIONAL=0
+            MOTIVO="${MOTIVO}, Nao veio ping"
+        fi
     fi
 
     echo $FUNCTIONAL
@@ -189,16 +228,20 @@ while [ 1 -ne $SAI_n ]; do
         MAC=$(mac_AP $placa)
         ciclos_de_espera=6
 	else
-		echo -e "$cnn offline - `date +%H:%M:%S` at $MAC"
+		echo -e "\noffline - `date +%H:%M:%S` at $MAC"
+        echo -e "${MOTIVO}"
+        MOTIVO=""
         sleep 0.1
         echo -e "${COLOR_RED}\tstopping wifi ... ${COLOR_RESET}"
         # sudo service network-manager stop
         nmcli radio wifi off
-        sleep 2
+        sleep 0.1
         echo -e "${COLOR_RED}\tstarting wifi ... ${COLOR_RESET}"
-        ret=turn_on_network
-        sleep 3
-        ret=turn_on_radio
+        ret=$(turn_on_network)
+        sleep 0.1
+        ret=$(turn_on_radio)
+        sleep 0.5
+        nmcli device wifi list
         ciclos_de_espera=3
 	fi
 

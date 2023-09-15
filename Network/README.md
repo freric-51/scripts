@@ -11,7 +11,7 @@
 ### porque colocar em script
 
 - Organização
-- Vai que a memória falha :smile:
+- Vai que a minha memória falha :smile:
 
 |Script|Função inicial|
 |:-|:-|

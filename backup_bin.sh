@@ -137,6 +137,7 @@ function transfer_files {
     remove_file "$A$C" "$B$C" "avidemux_2.7.8.appImage"
     remove_file "$A$C" "$B$C" "avidemux_2.8.0.appImage"
     remove_file "$A$C" "$B$C" "balenaEtcher-1.5.45-x64.AppImage"
+    remove_file "$A$C" "$B$C" "balenaEtcher-1.18.4-x64.AppImage"
     remove_file "$A$C" "$B$C" "ClipGrab-3.8.14-x86_64.AppImage"
     remove_file "$A$C" "$B$C" "ClipGrab-3.9.6-x86_64.AppImage"
     remove_file "$A$C" "$B$C" "CPU-X_v3.2.4_x86_64.AppImage"
@@ -197,10 +198,14 @@ function transfer_files {
         C="/ric.local"
         exe_backup "$A$C" "$B$C"
 
-        C="/ric.local/public_html"
+        C="/ric.local/public_html_01"
+        exe_backup "$A$C" "$B$C"
+        C="/ric.local/public_html_02"
         exe_backup "$A$C" "$B$C"
 
-        C="/ric.local/public_html/user_icons"
+        C="/ric.local/public_html_01/user_icons"
+        exe_backup "$A$C" "$B$C"
+        C="/ric.local/public_html_02/user_icons"
         exe_backup "$A$C" "$B$C"
 
         A="/etc/apache2"
@@ -227,16 +232,16 @@ function transfer_files {
 }
 
 function dropbox_start {
-	dropbox start  </dev/null &>/dev/null
 	while [ `dropbox_isrunning` -eq 0 ] ; do
-		sleep 2
+        dropbox start  </dev/null &>/dev/null
+		sleep 5
 	done
 }
 
 function dropbox_stop {
 	while [ `dropbox_isrunning` -gt 0 ] ; do
 		dropbox stop  </dev/null &>/dev/null
-		sleep 2
+		sleep 5
 	done
 }
 

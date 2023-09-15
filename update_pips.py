@@ -143,7 +143,7 @@ def passo_07(p_new):
                         p_need_debian.append(msg_part)
                         ret_status = 0
             if ret_status > 0:
-                print('unknow error: ' + str(ret_results.split()[1]))
+                print('unknow error: ' + str(ret_results.split()[0:5]))
 
         else:
             print('\tExecution successful or with ' +
