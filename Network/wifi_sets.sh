@@ -220,6 +220,8 @@ fi
 SAI_n=999
 MAC=$(mac_AP $placa)
 
+nmcli device wifi list
+echo ""
 while [ 1 -ne $SAI_n ]; do
 	cnn=$(connected $placa)
     ciclos_de_espera=6
@@ -242,6 +244,7 @@ while [ 1 -ne $SAI_n ]; do
         ret=$(turn_on_radio)
         sleep 0.5
         nmcli device wifi list
+        echo ""
         ciclos_de_espera=3
 	fi
 

@@ -229,6 +229,24 @@ function transfer_files {
         fi
     done
 
+    # crack words
+    A="$HOME/bin/"
+    B="$HOME/Dropbox/linux/bin/"
+    C="crack_words"
+    exe_backup "$A$C" "$B$C"
+    remove_file "$A" "$B" "palavras.txt"
+    remove_file "$A" "$B" "sem_palavras.txt"
+    remove_file "$A" "$B" "low_sem_palavras.txt"
+
+    remove_file "$A" "$B" "words.txt"
+    remove_file "$A" "$B" "low_words.txt"
+
+    remove_file "$A" "$B" "crack_list.txt"
+
+    remove_file "$A" "$B" "all_words.py"
+    remove_file "$A" "$B" "tirar_acentos.sh"
+    remove_file "$A" "$B" "para_minusculas.sh"
+
 }
 
 function dropbox_start {
