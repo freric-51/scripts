@@ -293,6 +293,6 @@ do :; done
 
 ifs_restore	# to restore $IFS
 # ##################################################
-echo -e "${COLOR_BLUE} \nFim...\n ${COLOR_RESET}"
+echo -e "${COLOR_BLUE} \n\rFim...${COLOR_RESET}\n\r"
 
 #	kill -SIGKILL $PPID
