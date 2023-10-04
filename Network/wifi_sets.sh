@@ -53,7 +53,7 @@ function turn_on_network () {
         # MOTIVO+=", [I] network on"
         NET=1
     else
-        MOTIVO+=", [F] Falha nmcli - ${NET} - 2a tentativa"
+        MOTIVO+=", [F] nmcli - ${NET} - 2a tentativa"
         NET=0
     fi
 
@@ -72,7 +72,7 @@ function turn_on_radio () {
     if [ $RADIO == "enabled" ]; then
         RADIO=1
     else
-        MOTIVO+=", [F] Falha radio - ${RADIO} - 2a tentativa"
+        MOTIVO+=", [F] radio - ${RADIO} - 2a tentativa"
         RADIO=0
     fi
 
@@ -121,7 +121,7 @@ function conn_to_a_wifi () {
         RUN=`echo $RUN | xargs -I{}  nmcli con up id {}  2>/dev/null`
         if [[ -z $RUN ]]; then
             # error
-            MOTIVO+=", [W] Error: ${netID}"
+            MOTIVO+=", [W] ${netID}"
             RUN=0
         else
             # Conexão ativada com sucesso (caminho D-Bus ativo: /org/freedesktop/NetworkManager/ActiveConnection/11)
@@ -167,7 +167,7 @@ function connected () {
         ESSID=$(current_ESSID $placa)
         if [[ "$ESSID" == '""' ]] ;      then
             FUNCTIONAL=2
-            MOTIVO+=", [W] ESSID vazio"
+            # MOTIVO+=", [W] ESSID vazio"
         fi
         if [ "$ESSID" == 'off/any' ] ; then
             FUNCTIONAL=2
@@ -180,11 +180,11 @@ function connected () {
         conn_to_a_wifi $placa
         OK=$RETf
         if [[ $OK -eq "0" ]] ; then
-            MOTIVO+=", [W] falha conn_to_a_wifi"
+            MOTIVO+=", [W] 'conn_to_a_wifi'"
             FUNCTIONAL=0;
         else
             FUNCTIONAL=1
-            MOTIVO+=", [I] Conseguiu conexão com primeira wifi"
+            # MOTIVO+=", [I] Conseguiu conexão"
         fi
     fi
 
@@ -282,14 +282,13 @@ while [ 1 -ne $SAI_n ] ; do
         if [[ ! -z "$MOTIVO" ]] ; then
             echo  "${MOTIVO}"
             MOTIVO=""
-        else
-            echo  "${MOTIVO}"
-            MOTIVO=""
         fi
 	else
 		echo -e "\n\roffline - `date +%H:%M:%S` at $MAC"
-        echo  "${MOTIVO}"
-        MOTIVO=""
+        if [[ ! -z "$MOTIVO" ]] ; then
+            echo  "${MOTIVO}"
+            MOTIVO=""
+        fi
         sleep 0.1
 
         echo -e "${COLOR_RED}\tstopping wifi ... ${COLOR_RESET}"
@@ -316,7 +315,11 @@ while [ 1 -ne $SAI_n ] ; do
             sleep 3
             break
         else
-            sleep 11
+            if [[ 6 -eq $ciclos_de_espera ]]; then
+                sleep 11
+            else
+                sleep 0.1
+            fi
         fi
     done
 
