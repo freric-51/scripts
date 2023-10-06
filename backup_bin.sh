@@ -55,6 +55,8 @@ function dropbox_isrunning {
     exerun=$(ps -e |  grep -i dropbox | awk '{print $1}')
     if [ -z "$exerun" ]; then
         exerun=0
+    else
+        exerun=100
     fi
     echo $exerun
 }
