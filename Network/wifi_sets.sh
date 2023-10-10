@@ -44,7 +44,11 @@ function wifi_exist() {
     local External=""
     local Configured=$1
     # Configured=$(nmcli con show | grep wifi | cut -c-19 | sed -e 's/  */ /g'  | awk  '{print "\"" $0 "\""}' | sed -e 's/ " */"/g' | sed '{:q;N;s/\n/,/g;t q}')
-    External=$(nmcli device wifi list | tail +2 | cut -c26-47 |  sed -e 's/  */ /g' | awk  '{print "\"" $0 "\""}'  | sed -e 's/ " */"/g'  | sed -e 's/"  */"/g' | sed '{:q;N;s/\n/,/g;t q}')
+    # External=$(nmcli device wifi list | tail +2 | cut -c26-47 |  sed -e 's/  */ /g' | awk  '{print "\"" $0 "\""}'  | sed -e 's/ " */"/g'  | sed -e 's/"  */"/g' | sed '{:q;N;s/\n/,/g;t q}')
+    #   IN-USE  BSSID              SSID                            MODE   CHAN  RATE        SIGNAL  BARS  SECURITY
+    pos1=$(nmcli device wifi list | head -n 1 | awk '{print index($0," SSID")}')
+    pos2=$(nmcli device wifi list | head -n 1 | awk '{print index($0," MODE")}')
+    External=$(nmcli device wifi list | tail +2 | cut -c${pos1}-${pos2} |  sed -e 's/  */ /g' | awk  '{print "\"" $0 "\""}'  | sed -e 's/ " */"/g'  | sed -e 's/"  */"/g' | sed '{:q;N;s/\n/,/g;t q}')
 
     if [[ "$External" == *"$Configured"* ]]; then
         echo 1
@@ -106,12 +110,9 @@ function is_ping () {
     # com 2>/dev/null ping retorna vazio se a conexão não ocorrer, tratado com ' if -z'
     local IP="8.8.4.4"
     local Received="???"
+    Received=`ping -c1 -q -W7 ${IP} 2>/dev/null | sed  -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
 
-    Received=`ping -c1 -q -W3 ${IP} 2>/dev/null | sed  -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
-    if [[ -z $Received ]]; then
-        MOTIVO+=", [W] No ping against ${IP} `date +%H:%M:%S`"
-        Received=0
-    elif [[ $Received -eq "0" ]]; then
+    if [[ -z $Received ]] | [[ $Received -eq "0" ]]; then
         MOTIVO+=", [W] No ping against ${IP} `date +%H:%M:%S`"
         Received=0
     fi
@@ -125,18 +126,21 @@ function conn_to_a_wifi () {
     local placa=$1
     local netID=""
     local succeeded=1
-    local RUN=`nmcli device set $placa autoconnect yes`
+    local RUN=`nmcli device set $placa autoconnect no`
 
     exist=0
     while [ 0 -eq $exist ] ; do
-        RUN=`nmcli con show | grep wifi | cut -c-19 | sed -e 's/  */ /g'  | awk  '{print "\"" $0 "\""}' | sed -e 's/ " */"/g' | sed ${ID_WIFI}'!d' `
+        pos1=$(nmcli con show | head -n 1 | awk '{print index($0," UUID")}')
+        RUN=`nmcli con show | grep wifi | cut -c-${pos1} | sed -e 's/  */ /g'  | awk  '{print "\"" $0 "\""}' | sed -e 's/ " */"/g' | sed ${ID_WIFI}'!d' `
+        # RUN=`nmcli con show | grep wifi | cut -c-19 | sed -e 's/  */ /g'  | awk  '{print "\"" $0 "\""}' | sed -e 's/ " */"/g' | sed ${ID_WIFI}'!d' `
+
         netID=$RUN
         if [[ -z ${netID} ]] ;  then
             ID_WIFI=1
         else
             exist=$(wifi_exist ${netID})
             if [[ 0 -eq $exist ]] ; then
-                # MOTIVO+=" ${netID}=${ID_WIFI}"
+                MOTIVO+="[${ID_WIFI}]"
                 (( ID_WIFI+=1 ))
                 sleep 0.1
             fi
@@ -196,18 +200,6 @@ function to_connect_with_wifi () {
     fi
 
     if [ $FUNCTIONAL -eq "1" ] ; then
-        ESSID=$(current_ESSID $placa)
-        if [[ "$ESSID" == '""' ]] ; then
-            FUNCTIONAL=2
-            # MOTIVO+=", [W] ESSID vazio"
-        fi
-        if [ "$ESSID" == 'off/any' ] ; then
-            FUNCTIONAL=2
-            MOTIVO+=", [W] ESSID off any"
-        fi
-    fi
-
-    if [ $FUNCTIONAL -eq "2" ] ; then
         # try to connect to first wifi ESSID
         conn_to_a_wifi $placa
         OK=$RETf
@@ -221,23 +213,23 @@ function to_connect_with_wifi () {
     fi
 
     if [ $FUNCTIONAL -eq "1" ] ; then
+        ESSID=$(current_ESSID $placa)
+        if [[ "$ESSID" == '""' ]] ; then
+            FUNCTIONAL=0
+            MOTIVO+=", [W] ESSID vazio"
+        fi
+        if [ "$ESSID" == 'off/any' ] ; then
+            FUNCTIONAL=0
+            MOTIVO+=", [W] ESSID off any"
+        fi
+    fi
+
+    if [ $FUNCTIONAL -eq "1" ] ; then
         SigLevel=$(Signal_Level $placa)
         if [[ $SigLevel -lt $MENOR_SINAL ]]; then
             MOTIVO+=", [I] Sinal ${SigLevel}"
             FUNCTIONAL=0
         fi
-
-        # is_ping
-        # Received=$RETf
-        # if [[ $Received -eq 0 ]]; then
-        #     sleep 3
-        #     is_ping
-        #     Received=$RETf
-        # fi
-        # if [[ $Received -eq 0 ]]; then
-        #     FUNCTIONAL=0
-        #     # MOTIVO+=", [W] Nao veio ping"
-        # fi
     fi
 
     RETf=$FUNCTIONAL
@@ -295,6 +287,7 @@ if [[ $TEST -eq 1 ]]; then
     echo "mac_AP = $(mac_AP $placa)"
 
     nmcli device wifi list
+    RUN=`nmcli device set $placa autoconnect yes`
     echo -e "FIM\n\r"
 
     exit
@@ -308,6 +301,12 @@ MAC=$(mac_AP $placa)
 while [ 1 -ne $SAI_n ] ; do
     is_ping
     cnn=$RETf
+    # if [[ "$cnn" -eq "0" ]] ; then
+    #     sleep 1
+    #     is_ping
+    #     cnn=$RETf
+    # fi
+
     if [[ "$cnn" -eq "1" ]] ; then
         ciclos_de_espera=6
         MAC=`mac_AP $placa`
@@ -348,4 +347,5 @@ while [ 1 -ne $SAI_n ] ; do
 
 done
 
+local RUN=`nmcli device set $placa autoconnect yes`
 echo -e "Fim monitoramento da conexão wifi${COLOR_RESET}"
