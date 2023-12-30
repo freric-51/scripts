@@ -16,11 +16,11 @@
 # $() or `` run in a separeted shell and variables are not updated
 # RETf must was created to pass the results and to avoid the use of $()
 
-source terminal_colors.sh
+source /home/ric/bin/terminal_colors.sh
 
 # percentagem de sinal considerado muito fraco
 MENOR_SINAL=-90
-MOTIVO="Revisao em 2023-10-01"
+MOTIVO="Revisao em 2023-12-10"
 RETf=""
 ID_WIFI=1
 
@@ -110,7 +110,20 @@ function is_ping () {
     # com 2>/dev/null ping retorna vazio se a conexão não ocorrer, tratado com ' if -z'
     local IP="8.8.4.4"
     local Received="???"
-    Received=`ping -c1 -q -W7 ${IP} 2>/dev/null | sed  -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+
+    Received=`ping -c1 -q -W12 ${IP} 2>/dev/null | sed  -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+
+    if [[ -z $Received ]] | [[ $Received -eq "0" ]]; then
+        sleep 0.7
+        IP="8.8.8.8"
+        Received=`ping -c1 -q -W12 ${IP} 2>/dev/null | sed  -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+    fi
+
+    if [[ -z $Received ]] | [[ $Received -eq "0" ]]; then
+        sleep 0.7
+        IP="8.8.4.4"
+        Received=`ping -c1 -q -W12 ${IP} 2>/dev/null | sed  -r '/^[\s\t]*$/d' | grep -i "rece" | cut -f2 -d, | cut -d" " -f2`
+    fi
 
     if [[ -z $Received ]] | [[ $Received -eq "0" ]]; then
         MOTIVO+=", [W] No ping against ${IP} `date +%H:%M:%S`"

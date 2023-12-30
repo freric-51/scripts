@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source terminal_colors.sh
+source /home/ric/bin/terminal_colors.sh
 
 if [ -z "$1" ] ; then
 	echo -e "${COLOR_RED}Não foi fornecido parametro. É esperado [1,2]"
